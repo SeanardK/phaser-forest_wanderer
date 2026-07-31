@@ -2,12 +2,16 @@ import { useEffect, useRef } from "react";
 import "./App.css";
 import Phaser, { GameObjects } from "phaser";
 
+const isDebug = false;
 const screenWidth = 800;
 const screenHeight = 300;
 const centerVerticalPosition = screenHeight / 2;
 const centerHorizontalPosition = screenWidth / 2;
+const speed = 100;
 
 class MainScene extends Phaser.Scene {
+  private cursors?: Phaser.Types.Input.Keyboard.CursorKeys;
+
   private player!: Phaser.Physics.Arcade.Sprite;
 
   constructor() {
@@ -43,6 +47,8 @@ class MainScene extends Phaser.Scene {
   }
 
   create() {
+    this.cursors = this.input.keyboard?.createCursorKeys();
+
     this.add.tileSprite(
       centerHorizontalPosition,
       centerVerticalPosition,
@@ -63,13 +69,45 @@ class MainScene extends Phaser.Scene {
     }
 
     // Player
-    this.player = this.physics.add.sprite(400, 150, "player");
+    this.player = this.physics.add.sprite(400, screenHeight - 32 * 2, "player");
+    this.player.body?.setSize(16, 45);
+    this.player.body?.setOffset(32, 20);
 
     // Collisions
-    this.physics.add.collider(platform, this.player);
+    this.player.setCollideWorldBounds(true);
+    this.physics.add.collider(this.player, platform);
+
+    // Animations
+    this.anims.create({
+      key: "player-standby",
+      frames: this.anims.generateFrameNames("player", { start: 0, end: 4 }),
+      frameRate: 10,
+      repeat: -1,
+    });
+    this.anims.create({
+      key: "player-walk",
+      frames: this.anims.generateFrameNumbers("player", { start: 11, end: 17 }),
+      frameRate: 10,
+      repeat: -1,
+    });
   }
 
-  update() {}
+  update() {
+    if (!this.cursors) return;
+
+    if (this.cursors.left.isDown) {
+      this.player.setFlipX(false);
+      this.player.setVelocityX(-speed);
+      this.player.anims.play("player-walk", true);
+    } else if (this.cursors.right.isDown) {
+      this.player.setFlipX(true);
+      this.player.setVelocity(speed);
+      this.player.anims.play("player-walk", true);
+    } else {
+      this.player.setVelocityX(0);
+      this.player.anims.play("player-standby");
+    }
+  }
 }
 
 function App() {
@@ -85,6 +123,7 @@ function App() {
         default: "arcade",
         arcade: {
           gravity: { y: 200, x: 0 },
+          debug: isDebug,
         },
       },
       scene: MainScene,
