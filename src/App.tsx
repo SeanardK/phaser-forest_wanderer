@@ -1,15 +1,73 @@
 import { useEffect, useRef } from "react";
 import "./App.css";
-import Phaser from "phaser";
+import Phaser, { GameObjects } from "phaser";
+
+const screenWidth = 800;
+const screenHeight = 300;
+const centerVerticalPosition = screenHeight / 2;
+const centerHorizontalPosition = screenWidth / 2;
 
 class MainScene extends Phaser.Scene {
+  private player!: Phaser.Physics.Arcade.Sprite;
+
   constructor() {
     super({ key: "MainScene" });
   }
 
-  preload() {}
+  preload() {
+    // Background
+    this.load.spritesheet(
+      "background",
+      "./assets/platformer/GandalfHardcore Background layers.gif",
+      {
+        frameWidth: 1024,
+        frameHeight: 346,
+      },
+    );
 
-  create() {}
+    // Grounds
+    this.load.spritesheet("dirt", "/assets/platformer/Floor Tiles1.png", {
+      frameWidth: 32,
+      frameHeight: 30,
+    });
+
+    // Players
+    this.load.spritesheet(
+      "player",
+      "/assets/charactes/Character skin colors/Male Skin2.png",
+      {
+        frameWidth: 80,
+        frameHeight: 64,
+      },
+    );
+  }
+
+  create() {
+    this.add.tileSprite(
+      centerHorizontalPosition,
+      centerVerticalPosition,
+      1024,
+      346,
+      "background",
+    );
+
+    // Object Declarations
+    const platform = this.physics.add.staticGroup();
+
+    // Platform
+    const totalTilesNeeded = Math.ceil(screenWidth / 32);
+    for (let i = 0; i < totalTilesNeeded; i++) {
+      const tileX = i * 32 + 32 / 2;
+
+      platform.create(tileX, screenHeight - 32 / 2, "dirt", 1);
+    }
+
+    // Player
+    this.player = this.physics.add.sprite(400, 150, "player");
+
+    // Collisions
+    this.physics.add.collider(platform, this.player);
+  }
 
   update() {}
 }
@@ -20,8 +78,8 @@ function App() {
   useEffect(() => {
     const config = {
       type: Phaser.AUTO,
-      width: 800,
-      height: 600,
+      width: screenWidth,
+      height: screenHeight,
       parent: "game-container",
       physics: {
         default: "arcade",
