@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import "./App.css";
-import Phaser, { GameObjects } from "phaser";
+import Phaser from "phaser";
 
 const isDebug = false;
 const screenWidth = 800;
@@ -13,6 +13,9 @@ class MainScene extends Phaser.Scene {
   private cursors?: Phaser.Types.Input.Keyboard.CursorKeys;
 
   private player!: Phaser.Physics.Arcade.Sprite;
+  private playerPants!: Phaser.GameObjects.Sprite;
+  private playerShirt!: Phaser.GameObjects.Sprite;
+  private playerHair!: Phaser.GameObjects.Sprite;
 
   constructor() {
     super({ key: "MainScene" });
@@ -39,6 +42,30 @@ class MainScene extends Phaser.Scene {
     this.load.spritesheet(
       "player",
       "/assets/charactes/Character skin colors/Male Skin2.png",
+      {
+        frameWidth: 80,
+        frameHeight: 64,
+      },
+    );
+    this.load.spritesheet(
+      "player-pants",
+      "/assets/charactes/Male Clothing/Blue Pants.png",
+      {
+        frameWidth: 80,
+        frameHeight: 64,
+      },
+    );
+    this.load.spritesheet(
+      "player-shirt",
+      "/assets/charactes/Male Clothing/Blue Shirt v2.png",
+      {
+        frameWidth: 80,
+        frameHeight: 64,
+      },
+    );
+    this.load.spritesheet(
+      "player-hair",
+      "/assets/charactes/Male Hair/Male Hair2.png",
       {
         frameWidth: 80,
         frameHeight: 64,
@@ -72,6 +99,21 @@ class MainScene extends Phaser.Scene {
     this.player = this.physics.add.sprite(400, screenHeight - 32 * 2, "player");
     this.player.body?.setSize(16, 45);
     this.player.body?.setOffset(32, 20);
+    this.playerPants = this.add.sprite(
+      400,
+      screenHeight - 32 * 2,
+      "player-pants",
+    );
+    this.playerShirt = this.add.sprite(
+      400,
+      screenHeight - 32 * 2,
+      "player-shirt",
+    );
+    this.playerHair = this.add.sprite(
+      400,
+      screenHeight - 32 * 2,
+      "player-hair",
+    );
 
     // Collisions
     this.player.setCollideWorldBounds(true);
@@ -86,7 +128,64 @@ class MainScene extends Phaser.Scene {
     });
     this.anims.create({
       key: "player-walk",
-      frames: this.anims.generateFrameNumbers("player", { start: 11, end: 17 }),
+      frames: this.anims.generateFrameNumbers("player", { start: 10, end: 17 }),
+      frameRate: 10,
+      repeat: -1,
+    });
+
+    this.anims.create({
+      key: "player-pants-standby",
+      frames: this.anims.generateFrameNumbers("player-pants", {
+        start: 0,
+        end: 4,
+      }),
+      frameRate: 10,
+      repeat: -1,
+    });
+    this.anims.create({
+      key: "player-pants-walk",
+      frames: this.anims.generateFrameNumbers("player-pants", {
+        start: 10,
+        end: 17,
+      }),
+      frameRate: 10,
+      repeat: -1,
+    });
+
+    this.anims.create({
+      key: "player-shirt-standby",
+      frames: this.anims.generateFrameNumbers("player-shirt", {
+        start: 0,
+        end: 4,
+      }),
+      frameRate: 10,
+      repeat: -1,
+    });
+    this.anims.create({
+      key: "player-shirt-walk",
+      frames: this.anims.generateFrameNumbers("player-shirt", {
+        start: 10,
+        end: 17,
+      }),
+      frameRate: 10,
+      repeat: -1,
+    });
+
+    this.anims.create({
+      key: "player-hair-standby",
+      frames: this.anims.generateFrameNumbers("player-hair", {
+        start: 0,
+        end: 4,
+      }),
+      frameRate: 10,
+      repeat: -1,
+    });
+    this.anims.create({
+      key: "player-hair-walk",
+      frames: this.anims.generateFrameNumbers("player-hair", {
+        start: 10,
+        end: 17,
+      }),
       frameRate: 10,
       repeat: -1,
     });
@@ -97,15 +196,45 @@ class MainScene extends Phaser.Scene {
 
     if (this.cursors.left.isDown) {
       this.player.setFlipX(false);
+      this.playerPants.setFlipX(false);
+      this.playerShirt.setFlipX(false);
+      this.playerHair.setFlipX(false);
+
       this.player.setVelocityX(-speed);
+      this.playerPants.setPosition(this.player.x - 2, this.player.y);
+      this.playerShirt.setPosition(this.player.x, this.player.y);
+      this.playerHair.setPosition(this.player.x, this.player.y);
+
       this.player.anims.play("player-walk", true);
+      this.playerPants.anims.play("player-pants-walk", true);
+      this.playerShirt.anims.play("player-shirt-walk", true);
+      this.playerHair.anims.play("player-hair-walk", true);
     } else if (this.cursors.right.isDown) {
       this.player.setFlipX(true);
-      this.player.setVelocity(speed);
+      this.playerPants.setFlipX(true);
+      this.playerShirt.setFlipX(true);
+      this.playerHair.setFlipX(true);
+
+      this.player.setVelocityX(speed);
+      this.playerPants.setPosition(this.player.x + 2, this.player.y);
+      this.playerShirt.setPosition(this.player.x, this.player.y);
+      this.playerHair.setPosition(this.player.x, this.player.y);
+
       this.player.anims.play("player-walk", true);
+      this.playerPants.anims.play("player-pants-walk", true);
+      this.playerShirt.anims.play("player-shirt-walk", true);
+      this.playerHair.anims.play("player-hair-walk", true);
     } else {
       this.player.setVelocityX(0);
+
+      this.playerPants.setPosition(this.player.x, this.player.y);
+      this.playerShirt.setPosition(this.player.x, this.player.y);
+      this.playerHair.setPosition(this.player.x, this.player.y);
+
       this.player.anims.play("player-standby");
+      this.playerPants.anims.play("player-pants-standby");
+      this.playerShirt.anims.play("player-shirt-standby", true);
+      this.playerHair.anims.play("player-hair-standby");
     }
   }
 }
