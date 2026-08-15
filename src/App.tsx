@@ -17,6 +17,8 @@ class MainScene extends Phaser.Scene {
   private playerShirt!: Phaser.GameObjects.Sprite;
   private playerHair!: Phaser.GameObjects.Sprite;
 
+  private background!: Phaser.GameObjects.TileSprite;
+
   constructor() {
     super({ key: "MainScene" });
   }
@@ -76,7 +78,7 @@ class MainScene extends Phaser.Scene {
   create() {
     this.cursors = this.input.keyboard?.createCursorKeys();
 
-    this.add.tileSprite(
+    this.background = this.add.tileSprite(
       centerHorizontalPosition,
       centerVerticalPosition,
       1024,
@@ -84,15 +86,22 @@ class MainScene extends Phaser.Scene {
       "background",
     );
 
+    this.background.setScrollFactor(0);
+
     // Object Declarations
     const platform = this.physics.add.staticGroup();
 
     // Platform
-    const totalTilesNeeded = Math.ceil(screenWidth / 32);
+    const totalTilesNeeded = 1000;
     for (let i = 0; i < totalTilesNeeded; i++) {
       const tileX = i * 32 + 32 / 2;
 
-      platform.create(tileX, screenHeight - 32 / 2, "dirt", 1);
+      platform.create(
+        tileX - (totalTilesNeeded / 2) * 32,
+        screenHeight - 32 / 2,
+        "dirt",
+        1,
+      );
     }
 
     // Player
@@ -115,8 +124,9 @@ class MainScene extends Phaser.Scene {
       "player-hair",
     );
 
+    this.cameras.main.startFollow(this.player, true, 1, 1, 0, 85);
+
     // Collisions
-    this.player.setCollideWorldBounds(true);
     this.physics.add.collider(this.player, platform);
 
     // Animations
@@ -205,6 +215,8 @@ class MainScene extends Phaser.Scene {
       this.playerShirt.setPosition(this.player.x, this.player.y);
       this.playerHair.setPosition(this.player.x, this.player.y);
 
+      this.background.tilePositionX -= 2;
+
       this.player.anims.play("player-walk", true);
       this.playerPants.anims.play("player-pants-walk", true);
       this.playerShirt.anims.play("player-shirt-walk", true);
@@ -219,6 +231,8 @@ class MainScene extends Phaser.Scene {
       this.playerPants.setPosition(this.player.x + 2, this.player.y);
       this.playerShirt.setPosition(this.player.x, this.player.y);
       this.playerHair.setPosition(this.player.x, this.player.y);
+
+      this.background.tilePositionX += 2;
 
       this.player.anims.play("player-walk", true);
       this.playerPants.anims.play("player-pants-walk", true);
