@@ -212,7 +212,7 @@ class MainScene extends Phaser.Scene {
 
       this.player.setVelocityX(-speed);
       this.playerPants.setPosition(this.player.x - 2, this.player.y);
-      this.playerShirt.setPosition(this.player.x, this.player.y);
+      this.playerShirt.setPosition(this.player.x - 2, this.player.y);
       this.playerHair.setPosition(this.player.x, this.player.y);
 
       this.background.tilePositionX -= 2;
@@ -229,7 +229,7 @@ class MainScene extends Phaser.Scene {
 
       this.player.setVelocityX(speed);
       this.playerPants.setPosition(this.player.x + 2, this.player.y);
-      this.playerShirt.setPosition(this.player.x, this.player.y);
+      this.playerShirt.setPosition(this.player.x + 2, this.player.y);
       this.playerHair.setPosition(this.player.x, this.player.y);
 
       this.background.tilePositionX += 2;
